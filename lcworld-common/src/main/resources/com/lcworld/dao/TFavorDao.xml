@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.TFavorDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.lcworld.entity.TFavorEntity" id="tFavorMap">
+        <result property="id" column="id"/>
+        <result property="entityid" column="entityid"/>
+        <result property="uid" column="uid"/>
+        <result property="createtime" column="createtime"/>
+        <result property="status" column="status"/>
+        <result property="favortype" column="favortype"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.lcworld.entity.TFavorEntity">
+		select * from t_favor where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.lcworld.entity.TFavorEntity">
+		select * from t_favor f
+		<where>
+			<if test="uid!=null and uid.trim()!=''">f.uid = #{uid}</if>
+			<if test="type!=null">and f.favortype = #{type}</if>
+			<if test="entityid!=null">and f.entityid = #{entityid}</if>
+			<if test="status!=null">and f.status = #{status}</if>
+		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from t_favor
+		<where>
+			<if test="uid!=null and uid.trim()!=''">f.uid = #{uid}</if>
+			<if test="type!=null">and f.favortype = #{type}</if>
+			<if test="entityid!=null">and f.entityid = #{entityid}</if>
+			<if test="status!=null">and f.status = #{status}</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.lcworld.entity.TFavorEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into t_favor
+		(
+			`entityid`, 
+			`uid`, 
+			`createtime`, 
+			`status`, 
+			`favortype`
+		)
+		values
+		(
+			#{entityid}, 
+			#{uid}, 
+			#{createtime}, 
+			#{status}, 
+			#{favortype}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.TFavorEntity">
+		update t_favor 
+		<set>
+			<if test="entityid != null">`entityid` = #{entityid}, </if>
+			<if test="uid != null">`uid` = #{uid}, </if>
+			<if test="createtime != null">`createtime` = #{createtime}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="favortype != null">`favortype` = #{favortype}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from t_favor where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from t_favor where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

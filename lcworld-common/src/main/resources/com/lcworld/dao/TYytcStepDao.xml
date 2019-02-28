@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.TYytcStepDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.lcworld.entity.TYytcStepEntity" id="tYytcStepMap">
+        <result property="sId" column="s_id"/>
+        <result property="mId" column="m_id"/>
+        <result property="sContent" column="s_content"/>
+        <result property="sImg" column="s_img"/>
+        <result property="sSort" column="s_sort"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.lcworld.entity.TYytcStepEntity">
+		select * from t_yytc_step where s_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.lcworld.entity.TYytcStepEntity">
+		select * from t_yytc_step
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by s_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from t_yytc_step 
+	</select>
+	 
+	<insert id="save" parameterType="com.lcworld.entity.TYytcStepEntity" useGeneratedKeys="true" keyProperty="sId">
+		insert into t_yytc_step
+		(
+			`m_id`, 
+			`s_content`, 
+			`s_img`, 
+			`s_sort`
+		)
+		values
+		(
+			#{mId}, 
+			#{sContent}, 
+			#{sImg}, 
+			#{sSort}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.TYytcStepEntity">
+		update t_yytc_step 
+		<set>
+			<if test="mId != null">`m_id` = #{mId}, </if>
+			<if test="sContent != null">`s_content` = #{sContent}, </if>
+			<if test="sImg != null">`s_img` = #{sImg}, </if>
+			<if test="sSort != null">`s_sort` = #{sSort}</if>
+		</set>
+		where s_id = #{sId}
+	</update>
+	
+	<delete id="delete">
+		delete from t_yytc_step where s_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from t_yytc_step where s_id in 
+		<foreach item="sId" collection="array" open="(" separator="," close=")">
+			#{sId}
+		</foreach>
+	</delete>
+
+</mapper>

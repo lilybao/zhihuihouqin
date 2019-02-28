@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.DeviceDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.lcworld.entity.DeviceEntity" id="deviceMap">
+        <result property="deviceId" column="device_id"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="imei" column="imei"/>
+        <result property="addTime" column="add_time"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.lcworld.entity.DeviceEntity">
+		select * from tb_device where device_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.lcworld.entity.DeviceEntity">
+		select * from tb_device
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by device_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_device 
+	</select>
+	 
+	<insert id="save" parameterType="com.lcworld.entity.DeviceEntity" useGeneratedKeys="true" keyProperty="deviceId">
+		insert into tb_device
+		(
+			`device_name`, 
+			`imei`, 
+			`add_time`
+		)
+		values
+		(
+			#{deviceName}, 
+			#{imei}, 
+			#{addTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.DeviceEntity">
+		update tb_device 
+		<set>
+			<if test="deviceName != null">`device_name` = #{deviceName}, </if>
+			<if test="imei != null">`imei` = #{imei}, </if>
+			<if test="addTime != null">`add_time` = #{addTime}</if>
+		</set>
+		where device_id = #{deviceId}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_device where device_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_device where device_id in 
+		<foreach item="deviceId" collection="array" open="(" separator="," close=")">
+			#{deviceId}
+		</foreach>
+	</delete>
+
+</mapper>

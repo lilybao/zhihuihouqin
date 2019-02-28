@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.UserDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.lcworld.entity.UserEntity" id="userMap">
+        <result property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="mobile" column="mobile"/>
+        <result property="password" column="password"/>
+        <result property="createTime" column="create_time"/>
+        <result property="grade" column="grade"/>
+        <result property="gradeName" column="grade_name"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="subjecttype" column="subjecttype"/>
+        <result property="faceId" column="face_id"/>
+        <result property="textbookversion" column="textbookversion"/>
+        <result property="textbookId" column="textbook_id"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.lcworld.entity.UserEntity">
+		select * from tb_user where user_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.lcworld.entity.UserEntity">
+		select * from tb_user where 1=1
+		
+		<if test="username!=null and username!=''">
+			and username=#{username}
+		</if>
+		
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by user_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_user 
+	</select>
+	 
+	<insert id="save" parameterType="com.lcworld.entity.UserEntity" useGeneratedKeys="true" keyProperty="userId">
+		insert into tb_user
+		(
+			`username`, 
+			`mobile`, 
+			`password`, 
+			`create_time`, 
+			`grade`, 
+			`grade_name`, 
+			`sex`, 
+			`avatar`, 
+			`subjecttype`, 
+			`face_id`, 
+			`textbookversion`, 
+			`textbook_id`
+		)
+		values
+		(
+			#{username}, 
+			#{mobile}, 
+			#{password}, 
+			#{createTime}, 
+			#{grade}, 
+			#{gradeName}, 
+			#{sex}, 
+			#{avatar}, 
+			#{subjecttype}, 
+			#{faceId}, 
+			#{textbookversion}, 
+			#{textbookId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.UserEntity">
+		update tb_user 
+		<set>
+			<if test="username != null">`username` = #{username}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="password != null">`password` = #{password}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="grade != null">`grade` = #{grade}, </if>
+			<if test="gradeName != null">`grade_name` = #{gradeName}, </if>
+			<if test="sex != null">`sex` = #{sex}, </if>
+			<if test="avatar != null">`avatar` = #{avatar}, </if>
+			<if test="subjecttype != null">`subjecttype` = #{subjecttype}, </if>
+			<if test="faceId != null">`face_id` = #{faceId}, </if>
+			<if test="textbookversion != null">`textbookversion` = #{textbookversion}, </if>
+			<if test="textbookId != null">`textbook_id` = #{textbookId}</if>
+		</set>
+		where user_id = #{userId}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_user where user_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_user where user_id in 
+		<foreach item="userId" collection="array" open="(" separator="," close=")">
+			#{userId}
+		</foreach>
+	</delete>
+
+</mapper>

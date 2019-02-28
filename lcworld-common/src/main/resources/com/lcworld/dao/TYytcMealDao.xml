@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.TYytcMealDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.lcworld.entity.TYytcMealEntity" id="tYytcMealMap">
+        <result property="mId" column="m_id"/>
+        <result property="mTitle" column="m_title"/>
+        <result property="mCreateTime" column="m_create_time"/>
+        <result property="mSource" column="m_source"/>
+        <result property="mType" column="m_type"/>
+        <result property="mImg" column="m_img"/>
+        <result property="mContent" column="m_content"/>
+        <result property="mScanNum" column="m_scan_num"/>
+        <result property="mPraiseNum" column="m_praise_num"/>
+        <result property="mFavorNum" column="m_favor_num"/>
+        <result property="mCalories" column="m_calories"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.lcworld.entity.TYytcMealEntity">
+		select * from t_yytc_meal where m_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.lcworld.entity.TYytcMealEntity">
+		select * from t_yytc_meal m
+		<where>
+			<if test="mType!=null">m.m_type = #{mType}</if>
+			<if test="timeType!=null">m.time_type = #{timeType}</if>
+			<if test="keyword!=null and keyword.trim()!=''">m.m_title like concat('%',#{keyword},'%') or m.m_content like concat('%',#{keyword},'%')</if>
+		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by m_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from t_yytc_meal m
+		<where>
+			<if test="mType!=null and mType.trim()!=''">m.m_type = #{mType}</if>
+			<if test="timeType!=null">m.time_type = #{timeType}</if>
+			<if test="keyword!=null and keyword.trim()!=''">m.m_title like concat('%',#{keyword},'%') or m.m_content like concat('%',#{keyword},'%')</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.lcworld.entity.TYytcMealEntity" useGeneratedKeys="true" keyProperty="mId">
+		insert into t_yytc_meal
+		(
+			`m_title`, 
+			`m_create_time`, 
+			`m_source`, 
+			`m_type`, 
+			`m_img`, 
+			`m_content`, 
+			`m_scan_num`, 
+			`m_praise_num`, 
+			`m_favor_num`, 
+			`m_calories`
+		)
+		values
+		(
+			#{mTitle}, 
+			#{mCreateTime}, 
+			#{mSource}, 
+			#{mType}, 
+			#{mImg}, 
+			#{mContent}, 
+			#{mScanNum}, 
+			#{mPraiseNum}, 
+			#{mFavorNum}, 
+			#{mCalories}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.TYytcMealEntity">
+		update t_yytc_meal 
+		<set>
+			<if test="mTitle != null">`m_title` = #{mTitle}, </if>
+			<if test="mCreateTime != null">`m_create_time` = #{mCreateTime}, </if>
+			<if test="mSource != null">`m_source` = #{mSource}, </if>
+			<if test="mType != null">`m_type` = #{mType}, </if>
+			<if test="mImg != null">`m_img` = #{mImg}, </if>
+			<if test="mContent != null">`m_content` = #{mContent}, </if>
+			<if test="mScanNum != null">`m_scan_num` = #{mScanNum}, </if>
+			<if test="mPraiseNum != null">`m_praise_num` = #{mPraiseNum}, </if>
+			<if test="mFavorNum != null">`m_favor_num` = #{mFavorNum}, </if>
+			<if test="mCalories != null">`m_calories` = #{mCalories}</if>
+		</set>
+		where m_id = #{mId}
+	</update>
+	
+	<delete id="delete">
+		delete from t_yytc_meal where m_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from t_yytc_meal where m_id in 
+		<foreach item="mId" collection="array" open="(" separator="," close=")">
+			#{mId}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>报修维修订单</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("tbxwxorder:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("tbxwxorder:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("tbxwxorder:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">维修项目id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.menditem" placeholder="维修项目id"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">姓名</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.username" placeholder="姓名"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">手机号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.mobile" placeholder="手机号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">预约时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.invitetime" placeholder="预约时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">服务地点</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.serviceplace" placeholder="服务地点"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">维修人员id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.menderid" placeholder="维修人员id"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">详情信息</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.mendcontent" placeholder="详情信息"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">维修图片信息(多逗号分割)</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.mendimgs" placeholder="维修图片信息(多逗号分割)"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">价格</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.price" placeholder="价格"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">1:待接单，2： 已接单，3：已完成，4:待评价，5：已取消 </div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.orderstatus" placeholder="1:待接单，2： 已接单，3：已完成，4:待评价，5：已取消 "/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.uid" placeholder=""/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">下单时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.createtime" placeholder="下单时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">预约时间类型 1: 立即上门，2： 选择时间上门</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.invitetimetype" placeholder="预约时间类型 1: 立即上门，2： 选择时间上门"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">状态改变</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.orderchange" placeholder="状态改变"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">订单号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.ordercode" placeholder="订单号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">1: 支付，0：没</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.paystatus" placeholder="1: 支付，0：没"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否删除</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tBxwxOrder.isdel" placeholder="是否删除"/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/generator/tbxwxorder.js?_${date.systemTime}"></script>
+</body>
+</html>

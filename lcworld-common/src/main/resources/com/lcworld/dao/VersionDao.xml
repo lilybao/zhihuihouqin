@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.VersionDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.lcworld.entity.VersionEntity" id="versionMap">
+        <id property="versionId" column="version_id"/>
+        <result property="versionCode" column="version_code"/>
+        <result property="versionName" column="version_name"/>
+        <result property="type" column="type"/>
+        <result property="url" column="url"/>
+        <result property="isForceUpdate" column="is_force_update"/>
+        <result property="createTime" column="create_time"/>
+        <result property="content" column="content"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.lcworld.entity.VersionEntity">
+		select * from tb_version where version_id = #{value}
+	</select>
+	
+	<select id="selectLatest" resultType="com.lcworld.entity.VersionEntity" parameterType="int">
+		select * from tb_version where type=#{type} order by version_code desc limit 1
+	</select>
+
+	<select id="queryList" resultType="com.lcworld.entity.VersionEntity">
+		select * from tb_version
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by version_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_version 
+	</select>
+	 
+	<insert id="save" parameterType="com.lcworld.entity.VersionEntity">
+		insert into tb_version
+		(
+			`version_id`, 
+			`version_code`, 
+			`version_name`, 
+			`type`, 
+			`url`, 
+			`is_force_update`, 
+			`create_time`,
+			`content`
+		)
+		values
+		(
+			#{versionId}, 
+			#{versionCode}, 
+			#{versionName}, 
+			#{type}, 
+			#{url}, 
+			#{isForceUpdate}, 
+			#{createTime},
+			#{content}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.VersionEntity">
+		update tb_version 
+		<set>
+			<if test="versionCode != null">`version_code` = #{versionCode}, </if>
+			<if test="versionName != null">`version_name` = #{versionName}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="url != null">`url` = #{url}, </if>
+			<if test="isForceUpdate != null">`is_force_update` = #{isForceUpdate}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+			<if test="content != null">`content` = #{content}</if>
+		</set>
+		where version_id = #{versionId}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_version where version_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_version where version_id in 
+		<foreach item="versionId" collection="array" open="(" separator="," close=")">
+			#{versionId}
+		</foreach>
+	</delete>
+
+</mapper>

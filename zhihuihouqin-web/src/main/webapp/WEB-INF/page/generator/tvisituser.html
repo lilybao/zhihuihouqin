@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>来访人员</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("tvisituser:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("tvisituser:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("tvisituser:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">姓名</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.username" placeholder="姓名"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">手机号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.mobile" placeholder="手机号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">房间号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.roomnum" placeholder="房间号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">来访事由</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.reason" placeholder="来访事由"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">预计到达时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.expertarrivaltime" placeholder="预计到达时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">预计离开时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.expertleavetime" placeholder="预计离开时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">访问时段 1: 一次，2：一星期，3：半个月，4：长期</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.visitperiod" placeholder="访问时段 1: 一次，2：一星期，3：半个月，4：长期"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">车辆类型id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.cartypeid" placeholder="车辆类型id"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">车牌号前缀</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.precarcode" placeholder="车牌号前缀"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">车牌号尾数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tVisitUser.suffixcarcode" placeholder="车牌号尾数"/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/generator/tvisituser.js?_${date.systemTime}"></script>
+</body>
+</html>

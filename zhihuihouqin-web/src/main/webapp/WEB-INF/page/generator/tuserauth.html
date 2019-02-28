@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>认证表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("tuserauth:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("tuserauth:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("tuserauth:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">姓名</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tUserAuth.name" placeholder="姓名"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">电话</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tUserAuth.mobile" placeholder="电话"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">身份证号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tUserAuth.idcard" placeholder="身份证号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">职位编号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tUserAuth.positionid" placeholder="职位编号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">用户编号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tUserAuth.uid" placeholder="用户编号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">认证状态 0：未提交审核，1: 待审核，2：通过，3：不通过 </div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="tUserAuth.status" placeholder="认证状态 0：未提交审核，1: 待审核，2：通过，3：不通过 "/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/generator/tuserauth.js?_${date.systemTime}"></script>
+</body>
+</html>

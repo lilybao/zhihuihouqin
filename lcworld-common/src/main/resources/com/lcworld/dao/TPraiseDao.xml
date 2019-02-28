@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.TPraiseDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.lcworld.entity.TPraiseEntity" id="tPraiseMap">
+        <result property="upId" column="up_id"/>
+        <result property="uid" column="uid"/>
+        <result property="upStatus" column="up_status"/>
+        <result property="upTargetType" column="up_target_type"/>
+        <result property="entityid" column="entityid"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.lcworld.entity.TPraiseEntity">
+		select * from t_praise where up_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.lcworld.entity.TPraiseEntity">
+		select * from t_praise p
+		<where>
+			<if test="uid!=null and uid.trim()!=''">p.uid = #{uid}</if>
+			<if test="type!=null">and p.upTargetType = #{type}</if>
+			<if test="status!=null">and p.upStatus = #{status}</if>
+			<if test="entityid!=null">and p.entityid = #{entityid}</if>
+		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by up_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from t_praise
+		<where>
+			<if test="uid!=null and uid.trim()!=''">p.uid = #{uid}</if>
+			<if test="type!=null">and p.upTargetType = #{type}</if>
+			<if test="status!=null">and p.upStatus = #{status}</if>
+			<if test="entityid!=null">and p.entityid = #{entityid}</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.lcworld.entity.TPraiseEntity" useGeneratedKeys="true" keyProperty="upId">
+		insert into t_praise
+		(
+			`uid`, 
+			`up_status`, 
+			`up_target_type`, 
+			`entityid`
+		)
+		values
+		(
+			#{uid}, 
+			#{upStatus}, 
+			#{upTargetType}, 
+			#{entityid}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.TPraiseEntity">
+		update t_praise 
+		<set>
+			<if test="uid != null">`uid` = #{uid}, </if>
+			<if test="upStatus != null">`up_status` = #{upStatus}, </if>
+			<if test="upTargetType != null">`up_target_type` = #{upTargetType}, </if>
+			<if test="entityid != null">`entityid` = #{entityid}</if>
+		</set>
+		where up_id = #{upId}
+	</update>
+	
+	<delete id="delete">
+		delete from t_praise where up_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from t_praise where up_id in 
+		<foreach item="upId" collection="array" open="(" separator="," close=")">
+			#{upId}
+		</foreach>
+	</delete>
+
+</mapper>

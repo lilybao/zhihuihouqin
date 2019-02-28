@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>换货订单</title>
+#parse("sys/header.html")
+
+<style>
+.bm-view {
+  width: 100%;
+  height: 300px;
+}
+</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+		<div class="form-group col-sm-2">
+				<input type="text" class="form-control" v-model="q.vendorId" @keyup.enter="query" placeholder="柜机号">
+			</div>
+			<a class="btn btn-default" @click="query">查询</a>
+			
+			#if($shiro.hasPermission("exchange:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("exchange:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("exchange:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+			<div class="form-group" id="addressId">
+			   	<div class="col-sm-2 control-label">地址</div>
+			   	<div class="col-sm-10">
+			      <input type="text" v-model="exchange.addressId" class="form-control" id="vendorAddress" readonly="true" placeholder="地址"/>
+			    </div>
+			</div>
+			
+									<div class="form-group" id="vendoeId">
+			   	<div class="col-sm-2 control-label">柜机号</div>
+			   	<div class="col-sm-10">
+			      <select v-model="exchange.vendorId" id="vendorId" class="form-control"   onchange="setAddress()" ></select>
+			    </div>
+			</div>
+									<div class="form-group" id="gridId">
+			   	<div class="col-sm-2 control-label">格子号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="exchange.gridId" placeholder="格子"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">任务状态</div>
+			   	<div class="col-sm-10">
+			       <select v-model="exchange.status" id="status" class="form-control" placeholder="任务状态">
+			      	<option value="0">未完成</option><option value="1">已完成</option>
+			      </select>
+			    </div>
+			</div>
+									<div class="form-group" id="productIds">
+			   	<div class="col-sm-2 control-label">替换商品ID</div>
+			   	<div class="col-sm-10">
+			       <select v-model="exchange.productId"  id="productId" class="form-control" ></select>
+			    </div>
+			</div>
+									<div class="form-group" id="productReplaceIds">>
+			   	<div class="col-sm-2 control-label">被替换商品ID</div>
+			   	<div class="col-sm-10">
+			      <select v-model="exchange.productReplaceId"  id="productReplaceId" class="form-control" ></select>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/generator/exchange.js?_${date.systemTime}"></script>
+</body>
+</html>

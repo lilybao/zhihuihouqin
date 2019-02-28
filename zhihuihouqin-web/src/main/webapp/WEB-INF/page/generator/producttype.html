@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>商品类型表</title>
+#parse("sys/header.html")
+<link rel="stylesheet" href="${rc.contextPath}/statics/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
+<script src="${rc.contextPath}/statics/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="${rc.contextPath}/statics/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="${rc.contextPath}/statics/libs/ajaxupload.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="!showListPtGrid">
+		<div class="grid-btn row">
+			<div class="col-sm-8">
+				<div class="form-group col-sm-3">
+					<input type="text" class="form-control" v-model="q.ptName" @keyup.enter="query" placeholder="商品类别名称">
+				</div>
+				<div class="form-group col-sm-3">
+					<input type="text" class="form-control" v-model="q.createUserId" @keyup.enter="query" placeholder="创建者账户id">
+				</div>
+		        <div class="form-group col-sm-3">
+					<select class="form-control" v-model="q.status">
+					  <option value="">----商品状态----</option>
+					  <option value="1">原价</option>
+					  <option value="2">折扣</option>
+					</select>
+				</div>
+				<div class="form-group col-sm-2">
+					<select class="form-control" v-model="q.categoryOne">
+					  <option value="">----一级分类----</option>
+					  <option v-for="categoryOne in categoryOneList" :value="categoryOne.id">{{categoryOne.name}}</option>
+					</select>
+				</div>
+				<div class="form-group col-sm-2">
+					<select class="form-control" v-model="q.categoryTwo">
+					  <option value="">----二级分类----</option>
+					  <option v-for="categoryOne in categoryOneList" :value="categoryOne.id">{{categoryOne.name}}</option>
+					</select>
+				</div>
+				<div class="form-group col-sm-2">
+					<select class="form-control" v-model="q.brand">
+					  <option value="">----品牌----</option>
+					  <option v-for="brand in brandList" :value="brand.id">{{brand.name}}</option>
+					</select>
+				</div>
+				<div class="form-group col-sm-5">
+				<div class="input-group date form_datetime" data-date-format="yyyy MM dd - HH:ii p" data-link-field="dtp_input1">
+                    <input class="form-control" size="16" type="text" value="" readonly placeholder="创建时间开始">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+					<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                </div>
+					<input type="hidden" class="form-control" id="dtp_input1" v-model="q.createTimeStart" value=""/>
+                </div>
+				<div class="form-group col-sm-5">
+				<div class="input-group date form_datetime2" data-date-format="yyyy MM dd - HH:ii p" data-link-field="dtp_input2" >
+                    <input class="form-control" size="16" type="text" value="" readonly placeholder="创建时间截止" >
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+					<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                </div>
+					<input type="hidden" class="form-control" id="dtp_input2" v-model="q.createTimeEnd" value=""/>
+                </div>
+		       <script type="text/javascript">
+			       $(function(){
+			    	   $('.form_datetime').datetimepicker({
+			    	        language:  'zh-CN',
+			    	        weekStart: 1,
+			    	        todayBtn:  1,
+			    			autoclose: 1,
+			    			todayHighlight: 1,
+			    			startView: 2,
+			    			forceParse: 0,
+			    	        showMeridian: 1
+			    	    });
+			    	   $('.form_datetime2').datetimepicker({
+			    	        language:  'zh-CN',
+			    	        weekStart: 1,
+			    	        todayBtn:  1,
+			    			autoclose: 1,
+			    			todayHighlight: 1,
+			    			startView: 2,
+			    			forceParse: 0,
+			    	        showMeridian: 1
+			    	    });
+			       });
+		        </script>
+			</div>
+			<div class="col-sm-4 ">
+				<a class="btn btn-default" @click="query">查询</a>
+				#if($shiro.hasPermission("producttype:save"))
+				<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+				#end
+				#if($shiro.hasPermission("producttype:update"))
+				<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+				#end
+				#if($shiro.hasPermission("producttype:delete"))
+				<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+				#end
+				<a class="btn btn-primary" @click="kcPage">&nbsp;库存</a>
+				<a class="btn btn-primary" @click="detail">&nbsp;添加/修改详细</a>
+			</div>
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showListPt" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">商品编号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.name" placeholder="商品编号"/>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">标题</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.title" placeholder="标题"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">日租价</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.price" placeholder="日租价"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">首页缩略图</div>
+			   	<div class="col-sm-2">
+			      <a class="btn btn-primary" id="upload"><i class="fa fa-plus"></i>&nbsp;上传图片</a>
+			    </div>
+			   	<div class="col-sm-2">
+			      <input type="text" class="form-control" v-model="productType.avatar" placeholder="图片地址"/>
+			    </div>
+			   	<div class="col-sm-3">
+			      <img alt="" :src="productType.avatar" style="width:100px;height:100px"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">最新</div>
+			    <label class="radio-inline">
+				  <input type="radio" name="isnew" value="0" v-model="productType.isnew"/> 否
+				</label>
+				<label class="radio-inline">
+				  <input type="radio" name="isnew" value="1" v-model="productType.isnew"/> 是
+				</label>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">推荐</div>
+			    <label class="radio-inline">
+				  <input type="radio" name="recommend" value="0" v-model="productType.recommend"/> 否
+				</label>
+				<label class="radio-inline">
+				  <input type="radio" name="recommend" value="1" v-model="productType.recommend"/> 是
+				</label>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">商品状态</div>
+			    <label class="radio-inline">
+				  <input type="radio" name="status" value="1" v-model="productType.status"/> 原价
+				</label>
+				<label class="radio-inline">
+				  <input type="radio" name="status" value="2" v-model="productType.status"/> 折扣
+				</label>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">一级分类</div>
+			   	<div class="col-sm-10">
+			   		<select class="form-control" v-model="productType.catalogOne">
+					  <option value="">----一级分类----</option>
+					  <option v-for="categoryOne in categoryOneList" :value="categoryOne.id">{{categoryOne.name}}</option>
+					</select>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">二级分类</div>
+			   	<div class="col-sm-10">
+			   		<select class="form-control" v-model="productType.catalogTwo">
+					  <option value="">----二级分类----</option>
+					  <option v-for="categoryOne in categoryOneList" :value="categoryOne.id">{{categoryOne.name}}</option>
+					</select>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">库存</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.stock" placeholder="库存"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">搜索关键字</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.searchKey" placeholder="搜索关键字"/>
+			    </div>
+			</div>
+									
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否置顶</div>
+			   	<div class="col-sm-10">
+			      <label class="radio-inline">
+					  <input type="radio" name="toFirst" value="0" v-model="productType.toFirst"/> 否
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="toFirst" value="1" v-model="productType.toFirst"/> 是
+					</label>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">品牌</div>
+			   	<div class="col-sm-10">
+			      <select class="form-control" v-model="productType.brandId">
+					  <option value="">----品牌----</option>
+					  <option v-for="brand in brandList" :value="brand.id">{{brand.name}}</option>
+					</select>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">最大年龄</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.maxAge" placeholder="最大年龄"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">最小年龄</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.minAge" placeholder="最小年龄"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">重量</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.weight" placeholder="重量（单位g）"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">浮动价格</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.fluctuationPrice" placeholder="浮动价格"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">吊牌价</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.tagPrice" placeholder="吊牌价"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">尺寸</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.size" placeholder="尺寸"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">产地</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.productionPlace" placeholder="产地"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">材质</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productType.material" placeholder="材质"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">宝宝性别</div>
+			   	<div class="col-sm-10">
+			   		<label class="radio-inline">
+					  <input type="radio" name="sex" value="0" v-model="productType.toFirst"/> 女
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="sex" value="1" v-model="productType.toFirst"/> 男
+					</label>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+	<div v-show="!showListKcGrid">
+		<div class="grid-btn">
+			#if($shiro.hasPermission("product:save"))
+			<a class="btn btn-primary" @click="addKc"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("product:update"))
+			<a class="btn btn-primary" @click="updateKc"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("product:delete"))
+			<a class="btn btn-primary" @click="delKc"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+			<a class="btn btn-warning" @click="backToPt">&nbsp;返回商品类别页面</a>
+		</div>
+	    <table id="jqGridKc"></table>
+	    <div id="jqGridKcPager"></div>
+    </div>
+    
+    <div v-show="!showListKc" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">收入累计</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="product.total" placeholder="收入累计"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否完好</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="product.isWell" placeholder="是否完好"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否可租</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="product.leasable" placeholder="是否可租"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否消毒</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="product.disinfect" placeholder="是否消毒"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">出租累计</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="product.count" placeholder="出租累计"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">货号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="product.productNo" placeholder="货号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">商品类型</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="product.productTypeId" placeholder="商品类型" readonly="readonly"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="product.createTime" placeholder="创建时间"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">柜子号</div>
+			   	<div class="col-sm-10">
+			   		<select class="form-control" v-model="product.vendorNo" >
+					  <option value="">----柜子号----</option>
+					  <option v-for="vendor in vendorList" :value="vendor.no">柜子地址:{{vendor.address}}柜子号:{{vendor.no}}</option>
+					</select>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">格子号</div>
+			   	<div class="col-sm-10">
+			      <select class="form-control" v-model="product.gridNo">
+					  <option value="">----格子号----</option>
+					  <!-- <option v-for="grid in gridList" :value="grid.gridNo"><font color="red">格子号:{{grid.gridNo}}</font></option> -->
+					  <option v-for="gridNo in 24" :value="gridNo">格子号:{{gridNo}}</option>
+					</select>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdateKc" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reloadKc" value="返回"/>
+			</div>
+		</form>
+	</div>
+	<div v-show="!showListDetail" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">商品类型ID</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productDetail.productId" placeholder="商品类型ID" readonly="readonly"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">品牌</div>
+			   	<div class="col-sm-10">
+			      <select class="form-control" v-model="productDetail.brand">
+					  <option value="">----品牌----</option>
+					  <option v-for="brand in brandList" :value="brand.id">{{brand.name}}</option>
+					</select>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">产品型号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productDetail.productNo" placeholder="产品型号"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">玩具类型</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productDetail.type" placeholder="玩具类型"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">重量</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productDetail.weight" placeholder="重量"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">包装尺寸</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productDetail.inch" placeholder="包装尺寸"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">配件数量</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productDetail.mounts" placeholder="配件数量"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">锻炼能力</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productDetail.ability" placeholder="锻炼能力"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">注意事项</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="productDetail.attention" placeholder="注意事项"/>
+			    </div>
+			</div>
+			<!-- 商品详情图片 -->
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">详情图片</div>
+			   	<div class="col-sm-2" v-for="productDetailImg in productDetail.productDetailImgList">
+			   		<img alt="" :src="productDetailImg.imgPath" style="width:100px;height:100px"/>
+			      <input type="text" class="form-control"  v-model="productDetailImg.imgPath" placeholder="图片"/>
+			      <input type="text" class="form-control" v-model="productDetailImg.sort" placeholder="排序"/>
+			    </div>
+			    <div class="col-sm-2" >
+			    	<a class="btn btn-primary" id="uploadDPic"><i class="fa fa-plus"></i>&nbsp;上传图片</a>
+			    	<a class="btn btn-primary" @click="delDPic"><i class="fa fa-plus"></i>&nbsp;删除图片</a>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">轮播图片</div>
+			   	
+			   	<div class="col-sm-2" v-for="productRoolImg in productDetail.productRoolImgList">
+			   		<img alt="" :src="productRoolImg.imgPath" style="width:100px;height:100px"/>
+			      <input type="text" class="form-control"  v-model="productRoolImg.imgPath" placeholder="图片"/>
+			    </div>
+			    <div class="col-sm-2" >
+			    	<a class="btn btn-primary" id="uploadRPic"><i class="fa fa-plus"></i>&nbsp;上传图片</a>
+			    	<a class="btn btn-primary" @click="delRPic"><i class="fa fa-plus"></i>&nbsp;删除图片</a>
+			    </div>
+			</div>
+			
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdateDetail" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="backToPt" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/generator/producttype.js?_${date.systemTime}"></script>
+</body>
+</html>

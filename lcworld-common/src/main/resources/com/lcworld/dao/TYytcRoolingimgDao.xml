@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.TYytcRoolingimgDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.lcworld.entity.TYytcRoolingimgEntity" id="tYytcRoolingimgMap">
+        <result property="riId" column="ri_id"/>
+        <result property="riImgPath" column="ri_img_path"/>
+        <result property="riSort" column="ri_sort"/>
+        <result property="riMId" column="ri_m_id"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.lcworld.entity.TYytcRoolingimgEntity">
+		select * from t_yytc_roolingimg where ri_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.lcworld.entity.TYytcRoolingimgEntity">
+		select * from t_yytc_roolingimg
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by ri_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from t_yytc_roolingimg 
+	</select>
+	 
+	<insert id="save" parameterType="com.lcworld.entity.TYytcRoolingimgEntity" useGeneratedKeys="true" keyProperty="riId">
+		insert into t_yytc_roolingimg
+		(
+			`ri_img_path`, 
+			`ri_sort`, 
+			`ri_m_id`
+		)
+		values
+		(
+			#{riImgPath}, 
+			#{riSort}, 
+			#{riMId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.TYytcRoolingimgEntity">
+		update t_yytc_roolingimg 
+		<set>
+			<if test="riImgPath != null">`ri_img_path` = #{riImgPath}, </if>
+			<if test="riSort != null">`ri_sort` = #{riSort}, </if>
+			<if test="riMId != null">`ri_m_id` = #{riMId}</if>
+		</set>
+		where ri_id = #{riId}
+	</update>
+	
+	<delete id="delete">
+		delete from t_yytc_roolingimg where ri_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from t_yytc_roolingimg where ri_id in 
+		<foreach item="riId" collection="array" open="(" separator="," close=")">
+			#{riId}
+		</foreach>
+	</delete>
+
+</mapper>

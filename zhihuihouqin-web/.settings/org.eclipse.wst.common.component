@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="zhihuihouqin-web">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/user"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/bxwx"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/xxgg"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/dcfw"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/yytc"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/gxdfw"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/bgypfw"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/ylfw"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java/gzc"/>
+        <dependent-module archiveName="lcworld-common-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/lcworld-common/lcworld-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="lcworld-shiro-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/lcworld-shiro/lcworld-shiro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="lcworld-gen-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/lcworld-gen/lcworld-gen">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="zhihuihouqin-web"/>
+        <property name="java-output-path" value="/zhihuihouqin-web/target/classes"/>
+    </wb-module>
+</project-modules>

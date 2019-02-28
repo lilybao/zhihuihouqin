@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lcworld.dao.SysUserDao">
+	<select id="queryObject" resultType="com.lcworld.entity.SysUserEntity">
+		select * from sys_user where user_id = #{value}
+	</select>
+	
+	<select id="queryList" resultType="com.lcworld.entity.SysUserEntity">
+		select * from sys_user 
+		<where>
+			<if test="createUserId != null">
+				and `create_user_id` = #{createUserId} 
+			</if>
+			<if test="username != null and username.trim() != ''">
+				and `username` like concat('%',#{username},'%') 
+			</if>
+			<if test="mobile != null and mobile.trim() != ''">
+				and `mobile` like concat('%',#{mobile},'%') 
+			</if>
+			<if test="regionId != null and regionId.trim() != ''">
+				and `region_id` = #{regionId} 
+			</if>
+			<if test="type != null and type.trim() != ''">
+				and `type` = #{type}
+			</if>
+			<if test="roleId != null and roleId.trim() != ''">
+				and `user_id` in 
+				<foreach item="userId" collection="userIds" open="(" separator="," close=")">
+					#{userId}
+				</foreach>
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryTotal" resultType="int">
+		select count(*) from sys_user
+		<where>
+			<if test="createUserId != null">
+				and `create_user_id` = #{createUserId} 
+			</if>
+			<if test="username != null and username.trim() != ''">
+				and `username` like concat('%',#{username},'%') 
+			</if>
+			<if test="mobile != null and mobile.trim() != ''">
+				and `mobile` like concat('%',#{mobile},'%') 
+			</if>
+			<if test="regionId != null and regionId.trim() != ''">
+				and `region_id` = #{regionId} 
+			</if>
+			<if test="type != null and type.trim() != ''">
+				and `type` = #{type}
+			</if>
+			<if test="roleId != null and roleId.trim() != ''">
+				and `user_id` in 
+				<foreach item="userId" collection="userIds" open="(" separator="," close=")">
+					#{userId}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询用户的所有权限 -->
+	<select id="queryAllPerms" resultType="string">
+		select m.perms from sys_user_role ur 
+			LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id 
+			LEFT JOIN sys_menu m on rm.menu_id = m.menu_id 
+		where ur.user_id = #{userId}
+	</select>
+	
+	<!-- 查询用户的所有菜单ID --> 
+	<select id="queryAllMenuId" resultType="long">
+		select distinct rm.menu_id from sys_user_role ur 
+			LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id 
+		where ur.user_id = #{userId}
+	</select>
+	
+	<select id="queryByUserName" resultType="com.lcworld.entity.SysUserEntity">
+		select * from sys_user where username = #{username}
+	</select>
+	
+	<insert id="save" parameterType="com.lcworld.entity.SysUserEntity" useGeneratedKeys="true" keyProperty="userId">
+		insert into sys_user
+		(
+			`username`, 
+			`password`, 
+			`email`, 
+			`mobile`, 
+			`status`, 
+			`create_user_id`, 
+			`create_time`, 
+			`real_name`, 
+			`avatar`, 
+			`sex`, 
+			`age`, 
+			`remark`, 
+			`region_id`, 
+			`profile`, 
+			`job_number`, 
+			`type`, 
+			`position`
+		)
+		values
+		(
+			#{username}, 
+			#{password}, 
+			#{email}, 
+			#{mobile}, 
+			#{status}, 
+			#{createUserId}, 
+			#{createTime}, 
+			#{realName}, 
+			#{avatar}, 
+			#{sex}, 
+			#{age}, 
+			#{remark}, 
+			#{regionId}, 
+			#{profile}, 
+			#{jobNumber}, 
+			#{type}, 
+			#{position}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.lcworld.entity.SysUserEntity">
+		update sys_user 
+		<set>
+			<if test="username != null">`username` = #{username}, </if>
+			<if test="password != null">`password` = #{password}, </if>
+			<if test="email != null">`email` = #{email}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="realName != null">`real_name` = #{realName}, </if>
+			<if test="avatar != null">`avatar` = #{avatar}, </if>
+			<if test="sex != null">`sex` = #{sex}, </if>
+			<if test="age != null">`age` = #{age}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="regionId != null">`region_id` = #{regionId}, </if>
+			<if test="profile != null">`profile` = #{profile}, </if>
+			<if test="jobNumber != null">`job_number` = #{jobNumber}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="position != null">`position` = #{position}</if>
+		</set>
+		where user_id = #{userId}
+		<if test="createUserId != null">
+			and `create_user_id` = #{createUserId} 
+		</if>
+	</update>
+	
+	<update id="updatePassword" parameterType="map">
+		update sys_user set `password` = #{newPassword} 
+			where user_id = #{userId} and password = #{password}
+	</update>
+	
+	<delete id="deleteBatch">
+		delete from sys_user where user_id in 
+		<foreach item="userId" collection="array" open="(" separator="," close=")">
+			#{userId}
+		</foreach>
+		;
+		delete from sys_user_role where user_id in 
+		<foreach item="userId" collection="array" open="(" separator="," close=")">
+			#{userId}
+		</foreach>
+	</delete>
+
+</mapper>
